@@ -5,6 +5,7 @@ const passport = require('passport');
 const facebookStrategy = require('passport-facebook').Strategy;
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const morgan = require('morgan');
 
 const {User} = require('../db');
 const DIST_DIR   = path.join(__dirname,  "../dist");
@@ -13,6 +14,7 @@ const port = process.env.PORT || 8000;
 const app = express();
 
 app.use(express.static(DIST_DIR));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({ secret: 'secret' }))
@@ -34,9 +36,6 @@ passport.use(new facebookStrategy({
   profileFields: ['first_name', 'last_name', 'picture.type(large)', 'gender', 'emails', 'about', 'education', 'hometown', 'link', 'quotes'],
   enableProof: true
 }, (accessToken, refreshToken, profile, done) => {
-    console.log('profile from FB: ', profile);
-    console.log('accessToken: ', accessToken)
-    console.log('refreshToken: ', refreshToken)
     User.findOne({facebookId: profile.id})
     .then((user) => {
       if (user) {

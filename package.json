@@ -8,7 +8,9 @@
     "build": "webpack",
     "dev-server": "webpack-dev-server",
     "start": "node server",
-    "dev": "webpack && nodemon server"
+    "dev": "npm-run-all -s watchWebpack watchServer",
+    "watchWebpack": "webpack --watch",
+    "watchServer": "nodemon server"
   },
   "repository": {
     "type": "git",
@@ -33,10 +35,14 @@
     "find-or-create": "^1.1.0",
     "mongodb": "^3.0.0-rc0",
     "mongoose": "^4.13.7",
+    "morgan": "^1.9.0",
+    "npm-run-all": "^4.1.2",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "react": "^16.2.0",
+    "react-bootstrap": "^0.31.5",
     "react-dom": "^16.2.0",
+    "react-youtube": "^7.5.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.9.7"
   }
