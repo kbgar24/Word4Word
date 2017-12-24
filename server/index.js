@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const morgan = require('morgan');
 
-const {User} = require('../db');
+const { User, Room } = require('../db');
 const DIST_DIR   = path.join(__dirname,  "../dist");
 const port = process.env.PORT || 8000;
 
@@ -58,6 +58,8 @@ passport.use(new facebookStrategy({
   }
 ));
 
+/*--------- GET Handlers ----------*/
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(DIST_DIR, 'index.html'));
 });
@@ -79,10 +81,42 @@ app.get('/auth/facebook/callback',passport.authenticate('facebook', {
   failureRedirect: '/login',
 }), (req, res) => { res.redirect('/');});
 
+app.get('/api/rooms', (req, res) => {
+  Room.find({})
+  .then((rooms) => {
+    const formattedRooms = rooms.map(room => ({
+      name: room.name,
+      users: 0
+    }));
+    res.send(formattedRooms).status(200).end('Successfully retrieved rooms');
+  })
+  .catch((e) => {
+    console.error(e)
+    res.status(500).end('Unable to retrieve rooms');
+  });
+});
+
 app.get('*', (req, res) => {
   console.log('unknown req!: ', req.url);
   res.end('Unknown!!')
 });
+
+/*--------- POST Handlers ----------*/
+app.post('/api/rooms', (req, res) => {
+  const {name} = req.body;
+  Room.create({name})
+  .then(() => {
+    console.log(`New room added to database!: ${name}`)
+    res.status(201).end();
+  })
+  .catch((e) => {
+    console.error(e)
+    res.status(500).end()
+  });
+})
+
+
+
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
